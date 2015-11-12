@@ -9,11 +9,11 @@ Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_bur
 	current_burst_time = 0;
 	num_burst = num_burst_;
 	io_time = io_time_;
+	current_io_time = 0;
 	memory = memory_;
 	memory_start_index = -1;
 	total_turnaround_time = 0;
 	total_wait_time = 0;
-
 }
 
 
@@ -21,7 +21,7 @@ State Process::get_state() const {
 	return state;
 }
 
-int Process::get_proc_num() const {
+char Process::get_proc_num() const {
 	return proc_num;
 }
 
@@ -43,6 +43,10 @@ int Process::get_num_burst() const {
 
 int Process::get_io_time() const {
 	return io_time;
+}
+
+int Process::get_current_io_time() const {
+	return current_io_time;
 }
 
 int Process::get_memory() const {
@@ -72,6 +76,14 @@ void Process::increment_current_burst_time() {
 
 void Process::decrement_num_burst() {
 	num_burst--;
+}
+
+void Process::reset_current_io_time() {
+	current_io_time = 0;
+}
+
+void Process::increment_current_io_time() {
+	current_io_time++;
 }
 
 void Process::set_memory_start_index(const int new_index) {
