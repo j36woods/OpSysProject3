@@ -37,6 +37,10 @@ int Process::get_current_burst_time() const {
 	return current_burst_time;
 }
 
+int Process::get_remaining_burst_time() const{
+	return this->get_burst_time() - this->get_current_burst_time();
+}
+
 int Process::get_num_burst() const {
 	return num_burst;
 }

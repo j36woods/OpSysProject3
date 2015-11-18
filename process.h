@@ -27,6 +27,7 @@ public:
 	int get_memory_start_index() const;
 	int get_total_turnaround_time() const;
 	int get_total_wait_time() const;
+	int get_remaining_burst_time() const;
 
 	void reset_current_burst_time();
 	void increment_current_burst_time();
