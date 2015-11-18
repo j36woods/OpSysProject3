@@ -17,15 +17,18 @@ bool SRTQueue::isEmpty(){
 	return this->readyQueue.empty();
 }
 
-void RRQueue::addPRocess(Process* new_proc){
+void RRQueue::addProcess(Process* new_proc){
 	this->readyQueue.push_back(new_proc);
 }
 
 Process* RRQueue::getNextProcess(){
 	if(!(this->readyQueue.empty())){
-		return this->readyQueue.pop_front();
+		Process* tmp = this->readyQueue.front();
+		this->readyQueue.pop_front();
+		return tmp;
 	}
 	return NULL;
+}
 bool RRQueue::isEmpty(){
 	return this->readyQueue.empty();
 }

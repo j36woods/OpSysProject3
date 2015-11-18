@@ -36,7 +36,7 @@ unsigned Memory::defragment(unsigned start_time){
 	}
 	unsigned moved = 0;
 	while(true){
-		if(right_index >= this->memory_bank.size) return curr_time;
+		if(right_index >= this->memory_bank.size()) return curr_time;
 		
 		if(this->memory_bank[right_index] == '.'){
 			++right_index;
@@ -60,18 +60,18 @@ unsigned Memory::defragment(unsigned start_time){
 
 FFMemory::FFMemory(){
 	for(unsigned i = 0; i < 256; ++i){
-		this->memory_bank.push('.');
+		this->memory_bank.push_back('.');
 	}
 }
 NFMemory::NFMemory(){
 	this->previous_end = 0;
 	for(unsigned i = 0; i < 256; ++i){
-		this->memory_bank.push('.');
+		this->memory_bank.push_back('.');
 	}
 }
 BFMemory::BFMemory(){
 	for(unsigned i = 0; i < 256; ++i){
-		this->memory_bank.push('.');
+		this->memory_bank.push_back('.');
 	}
 }
 
@@ -83,7 +83,7 @@ std::vector<Partition_T> Memory::getPartitions(){
 			while(index < this->memory_bank.size() && this->memory_bank[index] == '.'){
 				++index;
 			}
-			partitions.push_back(std::make_pair(p_start, index-1);
+			partitions.push_back(std::make_pair(p_start, index-1));
 		}
 	}
 	return partitions;
@@ -183,7 +183,7 @@ int BFMemory::addProcess(Process* proc, unsigned start_time){
 				best_placement = *iter;
 				first = false;
 			}else{
-				if(iter->second - iter->first < best_placement.second-best_placement->first){
+				if(iter->second - iter->first < best_placement.second-best_placement.first){
 					best_placement = *iter;
 				}
 			}
