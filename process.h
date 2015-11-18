@@ -1,5 +1,8 @@
 #include <string>
 
+#ifndef PROCESS_H
+#define PROCESS_H
+
 typedef enum State {
 	IN_RQ, 
 	USING_CPU,
@@ -53,3 +56,4 @@ private:
 	int total_wait_time;
 };
 
+#endif
