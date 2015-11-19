@@ -21,19 +21,19 @@ public:
 	virtual int addProcess(Process* proc, unsigned start_time) = 0;
 };
 
-class FFMemory : Memory {
+class FFMemory : public Memory {
 public:
 	FFMemory();
 	int addProcess(Process* proc, unsigned start_time);
 };
 
-class NFMemory : Memory{
+class NFMemory : public Memory{
 	unsigned previous_end;
 public:
 	NFMemory();
 	int addProcess(Process* proc, unsigned start_time);
 };
-class BFMemory : Memory{
+class BFMemory : public Memory{
 public:
 	BFMemory();
 	int addProcess(Process* proc, unsigned start_time);
