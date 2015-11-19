@@ -30,9 +30,9 @@ int CPU::get_remaining_time() {
 	return p->get_burst_time() - p->get_current_burst_time();
 }
 
-Process* CPU::preempt_process(Process& new_p) {
+Process* CPU::preempt_process() {
 	Process* old_p = p;
-	p = &new_p;
+	p = NULL;
 	return old_p;
 }
 
@@ -43,6 +43,7 @@ Process* CPU::remove_finished_process() {
 	if (p->get_burst_time() - p->get_current_burst_time() <= 0) {
 		Process* old_p = p;
 		old_p->reset_current_burst_time();
+		old_p->decrement_num_burst();
 		p = NULL;
 		return old_p;
 	}
