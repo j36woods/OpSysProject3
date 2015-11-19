@@ -12,8 +12,8 @@ bool CPU::is_empty() {
 	}
 }
 
-void CPU::add_process(Process& new_p) {
-	p = &new_p;
+void CPU::add_process(Process* new_p) {
+	p = new_p;
 }
 
 void CPU::update_process() {
