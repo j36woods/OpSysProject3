@@ -4,6 +4,7 @@ class CPU {
 
 public:
 	CPU();
+	bool is_empty();
 	void add_process(Process& new_p);
 	void update_process();
 	int get_remaining_time();

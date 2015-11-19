@@ -53,7 +53,7 @@ int Process::get_current_io_time() const {
 	return current_io_time;
 }
 
-int Process::get_memory() const {
+unsigned int Process::get_memory() const {
 	return memory;
 }
 

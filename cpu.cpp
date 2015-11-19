@@ -4,6 +4,14 @@ CPU::CPU() {
 	p = NULL;
 }
 
+bool CPU::is_empty() {
+	if (p == NULL) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void CPU::add_process(Process& new_p) {
 	p = &new_p;
 }

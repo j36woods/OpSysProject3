@@ -26,7 +26,7 @@ public:
 	int get_num_burst() const;
 	int get_io_time() const;
 	int get_current_io_time() const;
-	int get_memory() const;
+	unsigned int get_memory() const;
 	int get_memory_start_index() const;
 	int get_total_turnaround_time() const;
 	int get_total_wait_time() const;
