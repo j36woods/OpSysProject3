@@ -12,13 +12,15 @@ protected:
 	std::vector<char> memory_bank;
 	unsigned t_memmove;
 	std::vector<Partition_T> getPartitions();
-	void placeProcess(Process* proc, unsigned start);	
+	void placeProcess(Process* proc, unsigned start);
+	Memory();
 public:
 	void printMemory();
 	unsigned defragment(unsigned start_time);
 	void set_t_memmove(unsigned t);
 	//if defrag is triggered, returns new time, otherwise returns start_time if unable to add, returns -1
 	virtual int addProcess(Process* proc, unsigned start_time) = 0;
+	bool removeProcess(Process* proc);
 };
 
 class FFMemory : public Memory {
