@@ -75,9 +75,13 @@ Memory::Memory(){
 	}
 }
 
+FFMemory::FFMemory(){}
+
 NFMemory::NFMemory(){
 	this->previous_end = 0;
 }
+
+BFMemory::BFMemory(){}
 
 std::vector<Partition_T> Memory::getPartitions(){
 	std::vector<Partition_T> partitions;
