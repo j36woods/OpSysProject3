@@ -23,7 +23,17 @@ void Memory::printMemory(){
 void Memory::set_t_memmove(unsigned t){
 	this->t_memmove = t;
 }
+bool Memory::removeProcess(Process* proc){
+	bool removed = false;
+	for(unsigned i = 0; i < this->memory_bank.size(); ++i){
+		if(this->memory_bank[i] == proc->get_proc_num()){
+			this->memory_bank[i] = '.';
+			removed = true;
+		}
+	}
+	return removed;
 
+}
 unsigned Memory::defragment(unsigned start_time){
 	std::cout << "time " << start_time << "ms: Starting defragmentation (suspending all processes)" << std::endl;
 	this->printMemory();
@@ -58,21 +68,15 @@ unsigned Memory::defragment(unsigned start_time){
 	this->printMemory();
 }
 
-FFMemory::FFMemory(){
+Memory::Memory(){
+	t_memmove = 10;
 	for(unsigned i = 0; i < 256; ++i){
 		this->memory_bank.push_back('.');
 	}
 }
+
 NFMemory::NFMemory(){
 	this->previous_end = 0;
-	for(unsigned i = 0; i < 256; ++i){
-		this->memory_bank.push_back('.');
-	}
-}
-BFMemory::BFMemory(){
-	for(unsigned i = 0; i < 256; ++i){
-		this->memory_bank.push_back('.');
-	}
 }
 
 std::vector<Partition_T> Memory::getPartitions(){
