@@ -44,7 +44,7 @@ unsigned Memory::defragment(unsigned start_time, unsigned& moved){
 		++left_index;
 		++right_index;
 	}
-	unsigned moved = 0;
+	moved = 0;
 	while(true){
 		if(right_index >= this->memory_bank.size()) {
 			return curr_time;
@@ -106,7 +106,7 @@ void Memory::placeProcess(Process* proc, unsigned start){
 	}
 }
 
-bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
+bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int& last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
@@ -133,7 +133,7 @@ bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	return false;
 }
 
-bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
+bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int& last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
@@ -192,7 +192,7 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	return false;
 }
 
-bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
+bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int& last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
