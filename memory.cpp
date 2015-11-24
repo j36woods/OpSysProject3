@@ -46,7 +46,11 @@ unsigned Memory::defragment(unsigned start_time){
 	}
 	unsigned moved = 0;
 	while(true){
-		if(right_index >= this->memory_bank.size()) return curr_time;
+		if(right_index >= this->memory_bank.size()) {
+			std::cout << "time " << curr_time << "ms: Completed defragmentation (moved " << moved << " memory units)" << std::endl;
+			this->printMemory();
+			return curr_time;
+		}
 		
 		if(this->memory_bank[right_index] == '.'){
 			++right_index;
@@ -64,8 +68,6 @@ unsigned Memory::defragment(unsigned start_time){
 		}
 
 	}
-	std::cout << "time " << curr_time << "ms: Completed defragmentation (moved " << moved << " memory units)" << std::endl;
-	this->printMemory();
 }
 
 Memory::Memory(){
@@ -106,28 +108,32 @@ void Memory::placeProcess(Process* proc, unsigned start){
 	}
 }
 
-int FFMemory::addProcess(Process* proc, unsigned start_time){
+bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
 	std::vector<Partition_T> partitions = this->getPartitions();
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
 		unsigned p_size = iter->second - iter->first + 1;
 		if(p_size >= proc->get_memory()){
 			this->placeProcess(proc, iter->first);
-			return (int)start_time;
+			//return (int)start_time;
+			new_time = start_time;
+			return true;
 		}
 	}
-	unsigned new_time = this->defragment(start_time);
+	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
+	new_time = this->defragment(start_time);
 	partitions = this->getPartitions();
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
 		unsigned p_size = iter->second - iter->first + 1;
 		if(p_size >= proc->get_memory()){
 			this->placeProcess(proc, iter->first);
-			return (int)new_time;
+			//return (int)new_time;
+			return true;
 		}
 	}
-	return -1;
+	return false;
 }
 
-int NFMemory::addProcess(Process* proc, unsigned start_time){
+bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
 	bool first = true;
@@ -149,10 +155,13 @@ int NFMemory::addProcess(Process* proc, unsigned start_time){
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
 		previous_end = best_placement.first+proc->get_memory();
-		return (int)start_time;
+		//return (int)start_time;
+		new_time = start_time;
+		return true;
 	}
 
-	unsigned new_time = this->defragment(start_time);
+	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
+	new_time = this->defragment(start_time);
 	//retry
 	previous_end = 0;
 	partitions = this->getPartitions();
@@ -175,12 +184,13 @@ int NFMemory::addProcess(Process* proc, unsigned start_time){
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
 		previous_end = best_placement.first+proc->get_memory();
-		return (int)new_time;
+		return true;
+		//return (int)new_time;
 	}
-	return -1;
+	return false;
 }
 
-int BFMemory::addProcess(Process* proc, unsigned start_time){
+bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
 	bool first = true;
@@ -199,10 +209,12 @@ int BFMemory::addProcess(Process* proc, unsigned start_time){
 	}
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
-		return (int)start_time;
+		//return (int)start_time;
+		new_time = start_time;
+		return true;
 	}
-
-	unsigned new_time = this->defragment(start_time);
+	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";	
+	new_time = this->defragment(start_time);
 	//retry
 	partitions = this->getPartitions();
 	first = true;
@@ -221,7 +233,8 @@ int BFMemory::addProcess(Process* proc, unsigned start_time){
 	}
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
-		return (int)new_time;
+		//return (int)new_time;
+		return true;
 	}
-	return -1;
+	return false;
 }

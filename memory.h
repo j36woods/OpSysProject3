@@ -19,26 +19,26 @@ public:
 	unsigned defragment(unsigned start_time);
 	void set_t_memmove(unsigned t);
 	//if defrag is triggered, returns new time, otherwise returns start_time if unable to add, returns -1
-	virtual int addProcess(Process* proc, unsigned start_time) = 0;
+	virtual bool addProcess(Process* proc, unsigned start_time, unsigned& new_time) = 0;
 	bool removeProcess(Process* proc);
 };
 
 class FFMemory : public Memory {
 public:
 	FFMemory();
-	int addProcess(Process* proc, unsigned start_time);
+	bool addProcess(Process* proc, unsigned start_time, unsigned& new_time);
 };
 
 class NFMemory : public Memory{
 	unsigned previous_end;
 public:
 	NFMemory();
-	int addProcess(Process* proc, unsigned start_time);
+	bool addProcess(Process* proc, unsigned start_time, unsigned& new_time);
 };
 class BFMemory : public Memory{
 public:
 	BFMemory();
-	int addProcess(Process* proc, unsigned start_time);
+	bool addProcess(Process* proc, unsigned start_time, unsigned& new_time);
 };
 
 #endif
