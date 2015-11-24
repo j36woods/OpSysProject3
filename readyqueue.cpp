@@ -1,4 +1,5 @@
 #include "readyqueue.h"
+#include <iostream>
 
 void SRTQueue::addProcess(Process* new_proc){
 	this->readyQueue.push(new_proc);
@@ -30,6 +31,21 @@ void SRTQueue::updateWaitTimes() {
 	}
 }
 
+void SRTQueue::printQueue() {
+	std::cout << "[Q";
+	std::vector<Process*> tmp_storage;
+	while (!this->readyQueue.empty()) {
+		Process* tmp = this->readyQueue.top();
+		std::cout << " " << tmp->get_proc_num();
+		tmp_storage.push_back(tmp);
+		this->readyQueue.pop();
+	}
+	std::cout << "]\n";
+	for (unsigned int i = 0; i < tmp_storage.size(); i++) {
+		this->readyQueue.push(tmp_storage[i]);
+	}
+}
+
 void RRQueue::addProcess(Process* new_proc){
 	this->readyQueue.push_back(new_proc);
 }
@@ -51,4 +67,13 @@ void RRQueue::updateWaitTimes() {
 	while (itr != this->readyQueue.end()) {
 		(*itr)->increment_wait_time();
 	}
+}
+
+void RRQueue::printQueue() {
+	std::cout << "[Q";
+	std::list<Process*>::iterator itr = this->readyQueue.begin();
+	while (itr != this->readyQueue.end()) {
+		std::cout << " " << (*itr)->get_proc_num();
+	}
+	std::cout << "]\n";
 }
