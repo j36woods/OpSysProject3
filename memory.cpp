@@ -34,7 +34,7 @@ bool Memory::removeProcess(Process* proc){
 	return removed;
 
 }
-unsigned Memory::defragment(unsigned start_time){
+unsigned Memory::defragment(unsigned start_time, unsigned& moved){
 	std::cout << "time " << start_time << "ms: Starting defragmentation (suspending all processes)" << std::endl;
 	this->printMemory();
 	unsigned curr_time = start_time;
@@ -47,8 +47,6 @@ unsigned Memory::defragment(unsigned start_time){
 	unsigned moved = 0;
 	while(true){
 		if(right_index >= this->memory_bank.size()) {
-			std::cout << "time " << curr_time << "ms: Completed defragmentation (moved " << moved << " memory units)" << std::endl;
-			this->printMemory();
 			return curr_time;
 		}
 		
@@ -108,7 +106,7 @@ void Memory::placeProcess(Process* proc, unsigned start){
 	}
 }
 
-bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
@@ -121,7 +119,7 @@ bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	
 	if (last_defrag < time_process_left_mem) {
 		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
-		new_time = this->defragment(start_time);
+		new_time = this->defragment(start_time,moved);
 		partitions = this->getPartitions();
 		for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
 			unsigned p_size = iter->second - iter->first + 1;
@@ -134,7 +132,7 @@ bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	return false;
 }
 
-bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
@@ -162,7 +160,8 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 
 	if (last_defrag < time_process_left_mem) {
 		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
-		new_time = this->defragment(start_time);
+		moved = 0;
+		new_time = this->defragment(start_time, moved);
 		//retry
 		previous_end = 0;
 		partitions = this->getPartitions();
@@ -191,7 +190,7 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	return false;
 }
 
-bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem, unsigned &moved){
 	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
@@ -215,7 +214,7 @@ bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	}
 	if (last_defrag < time_process_left_mem) {
 		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
-		new_time = this->defragment(start_time);
+		new_time = this->defragment(start_time, moved);
 		//retry
 		partitions = this->getPartitions();
 		first = true;

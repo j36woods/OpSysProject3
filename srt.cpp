@@ -1,5 +1,5 @@
 #include "arrivalcomparison.h"
-
+#include <queue>
 void srt_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
 		Memory* mem, int t_cs_) {
 	SRTQueue srt_queue;
