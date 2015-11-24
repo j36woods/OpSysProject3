@@ -13,8 +13,8 @@ Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_bur
 	current_io_time = 0;
 	memory = memory_;
 	memory_start_index = -1;
-	total_turnaround_time = 0;
-	total_wait_time = 0;
+	turnaround_time = 0;
+	wait_time = 0;
 }
 
 
@@ -66,12 +66,12 @@ int Process::get_memory_start_index() const {
 	return memory_start_index;
 }
 
-int Process::get_total_turnaround_time() const {
-	return total_turnaround_time;
+int Process::get_turnaround_time() const {
+	return turnaround_time;
 }
 
-int Process::get_total_wait_time() const {
-	return total_wait_time;
+int Process::get_wait_time() const {
+	return wait_time;
 }
 
 
@@ -103,10 +103,18 @@ void Process::set_memory_start_index(const int new_index) {
 	memory_start_index = new_index;
 }
 
-void Process::increment_total_turnaround_time() {
-	total_turnaround_time++;
+void Process::increase_turnaround_time(const int increase) {
+	turnaround_time += increase;
 }
 
-void Process::increment_total_wait_time() {
-	total_wait_time++;
+void Process::reset_turnaround_time() {
+	turnaround_time = 0;
+}
+
+void Process::increment_wait_time() {
+	wait_time++;
+}
+
+void Process::reset_wait_time() {
+	wait_time = 0;
 }

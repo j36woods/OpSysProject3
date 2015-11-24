@@ -13,6 +13,7 @@ public:
 	virtual void addProcess(Process* new_proc) = 0;
 	virtual Process* getNextProcess() = 0;
 	virtual bool isEmpty() = 0;
+	virtual void updateWaitTimes() = 0;
 };
 
 class SRTComparison{
@@ -33,6 +34,7 @@ public:
 	void addProcess(Process* new_proc);
 	Process* getNextProcess();
 	bool isEmpty();
+	void updateWaitTimes();
 };
 
 class RRQueue : ReadyQueue{
@@ -44,6 +46,7 @@ public:
 	void addProcess(Process* new_proc);
 	Process* getNextProcess();
 	bool isEmpty();
+	void updateWaitTimes();
 };
 
 #endif

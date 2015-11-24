@@ -29,8 +29,8 @@ public:
 	int get_current_io_time() const;
 	unsigned int get_memory() const;
 	int get_memory_start_index() const;
-	int get_total_turnaround_time() const;
-	int get_total_wait_time() const;
+	int get_turnaround_time() const;
+	int get_wait_time() const;
 	int get_remaining_burst_time() const;
 
 	void reset_current_burst_time();
@@ -40,8 +40,11 @@ public:
 	void reset_current_io_time();
 	void increment_current_io_time();
 	void set_memory_start_index(const int new_index);
-	void increment_total_turnaround_time();
-	void increment_total_wait_time();
+	void increase_turnaround_time(const int increase);
+	void increment_turnaround_time();
+	void reset_turnaround_time();
+	void increment_wait_time();
+	void reset_wait_time();
 
 private:
 	State state;
@@ -55,8 +58,8 @@ private:
 	int current_io_time;
 	int memory;
 	int memory_start_index;
-	int total_turnaround_time;
-	int total_wait_time;
+	int turnaround_time;
+	int wait_time;
 };
 
 #endif
