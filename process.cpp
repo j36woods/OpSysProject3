@@ -1,7 +1,7 @@
 #include "process.h"
 #include <string>
 
-Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_burst_, int io_time_, int memory_) {
+Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_burst_, int io_time_, int memory_, int proc_arrival_num_) {
 	state = NOT_IN_SYSTEM;
 	proc_num = proc_num_;
 	arrival_time = arrival_time_;
@@ -15,6 +15,8 @@ Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_bur
 	memory_start_index = -1;
 	turnaround_time = 0;
 	wait_time = 0;
+	proc_arrival_num = proc_arrival_num_;
+	ready_queue_arrival_time = -1;
 }
 
 
@@ -73,6 +75,14 @@ int Process::get_turnaround_time() const {
 int Process::get_wait_time() const {
 	return wait_time;
 }
+	
+int Process::get_proc_arrival_num() const {
+	return proc_arrival_num;
+}
+
+int Process::get_ready_queue_arrival_time() const {
+	return ready_queue_arrival_time;
+}
 
 
 void Process::reset_current_burst_time() {
@@ -103,8 +113,8 @@ void Process::set_memory_start_index(const int new_index) {
 	memory_start_index = new_index;
 }
 
-void Process::increase_turnaround_time(const int increase) {
-	turnaround_time += increase;
+void Process::increment_turnaround_time() {
+	turnaround_time++;
 }
 
 void Process::reset_turnaround_time() {
@@ -117,4 +127,8 @@ void Process::increment_wait_time() {
 
 void Process::reset_wait_time() {
 	wait_time = 0;
+}
+
+void Process::set_ready_queue_arrival_time(int ready_queue_arrival_time_) {
+	ready_queue_arrival_time = ready_queue_arrival_time_;
 }

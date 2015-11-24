@@ -16,7 +16,7 @@ typedef enum State {
 class Process {
 
 public:
-	Process(char proc_num_, int arrival_time_, int burst_time_, int num_burst_, int io_time_, int memory_);
+	Process(char proc_num_, int arrival_time_, int burst_time_, int num_burst_, int io_time_, int memory_, int proc_arrival_num_);
 	
 	State get_state() const;
 	char get_proc_num() const;
@@ -32,6 +32,9 @@ public:
 	int get_turnaround_time() const;
 	int get_wait_time() const;
 	int get_remaining_burst_time() const;
+	int get_proc_arrival_num() const;
+	int get_ready_queue_arrival_time() const;
+
 
 	void reset_current_burst_time();
 	void reset_num_burst();
@@ -40,11 +43,11 @@ public:
 	void reset_current_io_time();
 	void increment_current_io_time();
 	void set_memory_start_index(const int new_index);
-	void increase_turnaround_time(const int increase);
 	void increment_turnaround_time();
 	void reset_turnaround_time();
 	void increment_wait_time();
 	void reset_wait_time();
+	void set_ready_queue_arrival_time(int ready_queue_arrival_time_);
 
 private:
 	State state;
@@ -60,6 +63,8 @@ private:
 	int memory_start_index;
 	int turnaround_time;
 	int wait_time;
+	int proc_arrival_num;
+	int ready_queue_arrival_time;
 };
 
 #endif
