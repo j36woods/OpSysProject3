@@ -108,32 +108,34 @@ void Memory::placeProcess(Process* proc, unsigned start){
 	}
 }
 
-bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
+bool FFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
 		unsigned p_size = iter->second - iter->first + 1;
 		if(p_size >= proc->get_memory()){
 			this->placeProcess(proc, iter->first);
-			//return (int)start_time;
-			new_time = start_time;
 			return true;
 		}
 	}
-	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
-	new_time = this->defragment(start_time);
-	partitions = this->getPartitions();
-	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
-		unsigned p_size = iter->second - iter->first + 1;
-		if(p_size >= proc->get_memory()){
-			this->placeProcess(proc, iter->first);
-			//return (int)new_time;
-			return true;
+	
+	if (last_defrag < time_process_left_mem) {
+		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
+		new_time = this->defragment(start_time);
+		partitions = this->getPartitions();
+		for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
+			unsigned p_size = iter->second - iter->first + 1;
+			if(p_size >= proc->get_memory()){
+				this->placeProcess(proc, iter->first);
+				return true;
+			}
 		}
 	}
 	return false;
 }
 
-bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
+bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
 	bool first = true;
@@ -155,42 +157,42 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
 		previous_end = best_placement.first+proc->get_memory();
-		//return (int)start_time;
-		new_time = start_time;
 		return true;
 	}
 
-	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
-	new_time = this->defragment(start_time);
-	//retry
-	previous_end = 0;
-	partitions = this->getPartitions();
-	first = true;
-	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
-		unsigned p_size = iter->second - iter->first + 1;
-		if(p_size >= proc->get_memory()){
-			if(first){
-				best_placement = *iter;
-				first = false;
-				if(iter->first>previous_end) break;
-			}else{
-				if(iter->first > previous_end){
+	if (last_defrag < time_process_left_mem) {
+		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
+		new_time = this->defragment(start_time);
+		//retry
+		previous_end = 0;
+		partitions = this->getPartitions();
+		first = true;
+		for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
+			unsigned p_size = iter->second - iter->first + 1;
+			if(p_size >= proc->get_memory()){
+				if(first){
 					best_placement = *iter;
-					break;
+					first = false;
+					if(iter->first>previous_end) break;
+				}else{
+					if(iter->first > previous_end){
+						best_placement = *iter;
+						break;
+					}
 				}
 			}
 		}
-	}
-	if(!first){
-		this->placeProcess(proc, best_placement.first);
-		previous_end = best_placement.first+proc->get_memory();
-		return true;
-		//return (int)new_time;
+		if(!first){
+			this->placeProcess(proc, best_placement.first);
+			previous_end = best_placement.first+proc->get_memory();
+			return true;
+		}
 	}
 	return false;
 }
 
-bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time){
+bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time, int last_defrag, int time_process_left_mem){
+	new_time = start_time;
 	std::vector<Partition_T> partitions = this->getPartitions();
 	Partition_T best_placement;
 	bool first = true;
@@ -209,32 +211,31 @@ bool BFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	}
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
-		//return (int)start_time;
-		new_time = start_time;
 		return true;
 	}
-	std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";	
-	new_time = this->defragment(start_time);
-	//retry
-	partitions = this->getPartitions();
-	first = true;
-	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
-		unsigned p_size = iter->second - iter->first + 1;
-		if(p_size >= proc->get_memory()){
-			if(first){
-				best_placement = *iter;
-				first = false;
-			}else{
-				if(iter->second-iter->first < best_placement.second-best_placement.first){
+	if (last_defrag < time_process_left_mem) {
+		std::cout << "time " << start_time << "ms: Process '" << proc->get_proc_num() << "' unable to be added; lack of memory\n";
+		new_time = this->defragment(start_time);
+		//retry
+		partitions = this->getPartitions();
+		first = true;
+		for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
+			unsigned p_size = iter->second - iter->first + 1;
+			if(p_size >= proc->get_memory()){
+				if(first){
 					best_placement = *iter;
+					first = false;
+				}else{
+					if(iter->second-iter->first < best_placement.second-best_placement.first){
+						best_placement = *iter;
+					}
 				}
 			}
 		}
-	}
-	if(!first){
-		this->placeProcess(proc, best_placement.first);
-		//return (int)new_time;
-		return true;
+		if(!first){
+			this->placeProcess(proc, best_placement.first);
+			return true;
+		}
 	}
 	return false;
 }
