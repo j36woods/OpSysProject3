@@ -8,6 +8,7 @@ Process::Process(char proc_num_, int arrival_time_, int burst_time_, int num_bur
 	burst_time = burst_time_;
 	current_burst_time = 0;
 	num_burst = num_burst_;
+	current_num_burst = num_burst_;
 	io_time = io_time_;
 	current_io_time = 0;
 	memory = memory_;
@@ -45,6 +46,10 @@ int Process::get_num_burst() const {
 	return num_burst;
 }
 
+int Process::get_current_num_burst() const {
+	return current_num_burst;
+}
+
 int Process::get_io_time() const {
 	return io_time;
 }
@@ -74,12 +79,16 @@ void Process::reset_current_burst_time() {
 	current_burst_time = 0;
 }
 
+void Process::reset_num_burst() {
+	current_num_burst = num_burst;
+}
+
 void Process::increment_current_burst_time() {
 	current_burst_time++;
 }
 
 void Process::decrement_num_burst() {
-	num_burst--;
+	current_num_burst--;
 }
 
 void Process::reset_current_io_time() {

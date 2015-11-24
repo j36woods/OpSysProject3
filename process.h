@@ -24,6 +24,7 @@ public:
 	int get_burst_time() const;
 	int get_current_burst_time() const;
 	int get_num_burst() const;
+	int get_current_num_burst() const;
 	int get_io_time() const;
 	int get_current_io_time() const;
 	unsigned int get_memory() const;
@@ -33,6 +34,7 @@ public:
 	int get_remaining_burst_time() const;
 
 	void reset_current_burst_time();
+	void reset_num_burst();
 	void increment_current_burst_time();
 	void decrement_num_burst();
 	void reset_current_io_time();
@@ -48,6 +50,7 @@ private:
 	int burst_time;
 	int current_burst_time;
 	int num_burst;
+	int current_num_burst;
 	int io_time;
 	int current_io_time;
 	int memory;
