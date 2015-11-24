@@ -44,7 +44,7 @@ unsigned Memory::defragment(unsigned start_time, unsigned& moved){
 		++left_index;
 		++right_index;
 	}
-	unsigned moved = 0;
+	moved = 0;
 	while(true){
 		if(right_index >= this->memory_bank.size()) {
 			return curr_time;

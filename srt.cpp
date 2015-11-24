@@ -1,4 +1,10 @@
 #include "arrivalcomparison.h"
+#include "process.h"
+#include "readyqueue.h"
+#include "cpu.h"
+#include "io.h"
+#include "memory.h"
+#include <iostream>
 #include <queue>
 
 int srt_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
