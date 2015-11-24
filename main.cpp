@@ -51,6 +51,9 @@ int main(int argc, char* argv[]) {
 
 	std::string line;
 	std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue;
+	int n = 0;
+	float total_cpu_time = 0;
+	float total_cpu_bursts = 0;
 	while (std::getline(in_str, line)) {
 		//Ignore empty lines or commented lines
 		if (line.empty() || line[0] == '#') {
@@ -60,22 +63,59 @@ int main(int argc, char* argv[]) {
 		//Create a process object for each input line and add it to the arrival queue
 		std::vector<int> properties = splitString(line);
 		Process* process = new Process(line[0], properties[0], properties[1], properties[2], properties[3], properties[4]);
+		
+		total_cpu_time += (process->get_burst_time() * process->get_num_burst());
+		total_cpu_bursts += process->get_num_burst();
+
 		arrival_queue.push(process);
+		n++;
 	}
+
+	float average_cpu_time = total_cpu_time/total_cpu_bursts;
 
 	//Close the input stream
 	in_str.close();
 
+	//Open an output stream
+	std::ofstream of_str;
+	of_str.open("simout.txt");
+
 	SRTQueue srt_queue;
 	FFMemory ff_mem;
-	FFMemory* ff_ptr = &ff_mem;
+	NFMemory nf_mem;
+	BFMemory bf_mem;
 
 	int t_cs = 13;
+	int end_t;
+	int total_wait_time = 0;
+	int total_turnaround_time = 0;
+	int num_context_switches = 0;
+	float average_wait_time;
 
 	std::cout << "time 0ms: Simulator started for SRT and First-Fit\n";
-	srt_simulation(arrival_queue, ff_ptr, t_cs);
+	end_t = srt_simulation(arrival_queue, &ff_mem, t_cs, n, num_context_switches, total_wait_time);
+	std::cout << "time " << end_t-1 << "ms: Simulator for SRT and First-Fit ended\n";
+	
+	of_str << "Algorithm SRT\n";
+	of_str << "average CPU burst time: " << average_cpu_time << " ms\n";
+	of_str << "average wait time: " << (float)total_wait_time / total_cpu_bursts << " ms\n";
+	of_str << "average turnaround time: " << (float)total_turnaround_time / num_context_switches << " ms\n";
+	of_str << "total number of context switches: " << num_context_switches << std::endl;
 
 
+
+
+	/*std::cout << "\ntime 0ms: Simulator started for SRT and Next-Fit\n";
+	srt_simulation(arrival_queue, &nf_mem, t_cs, n);
+	std::cout << "time " << end_t-1 << "ms: Simulator for SRT and Next-Fit ended\n";
+	
+	std::cout << "\ntime 0ms: Simulator started for SRT and Best-Fit\n";
+	srt_simulation(arrival_queue, &bf_mem, t_cs, n);
+	std::cout << "time " << end_t-1 << "ms: Simulator for SRT and Best-Fit ended\n";
+*/
+
+
+	//!!!!!!!!!!!!!!!!Free up heap memory at the end!!!!!!!!!!!!!!
 
 	return 0;
 }
