@@ -11,9 +11,12 @@
 #include "io.h"
 #include "readyqueue.h"
 #include "memory.h"
-#include "srt.cpp"
 #include "arrivalcomparison.h"
 
+void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
+		Memory* mem, unsigned t_cs, unsigned t_slice);
+int srt_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
+		Memory *mem, int t_cs_, int n_, int &num_context_switches, int& total_wait_time);
 //Split the string wherever there is a '|' character
 std::vector<int> splitString(const std::string& s) {
 	std::vector<int> result;
@@ -62,7 +65,7 @@ int main(int argc, char* argv[]) {
 
 		//Create a process object for each input line and add it to the arrival queue
 		std::vector<int> properties = splitString(line);
-		Process* process = new Process(line[0], properties[0], properties[1], properties[2], properties[3], properties[4]);
+		Process* process = new Process(line[0], properties[0], properties[1], properties[2], properties[3], properties[4],n);
 		
 		total_cpu_time += (process->get_burst_time() * process->get_num_burst());
 		total_cpu_bursts += process->get_num_burst();

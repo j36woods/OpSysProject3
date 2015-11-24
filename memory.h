@@ -16,6 +16,7 @@ protected:
 	Memory();
 public:
 	void printMemory();
+	void printMemoryWithout(char c);
 	unsigned defragment(unsigned start_time, unsigned& moved);
 	void set_t_memmove(unsigned t);
 	//if defrag is triggered, returns new time, otherwise returns start_time if unable to add, returns -1

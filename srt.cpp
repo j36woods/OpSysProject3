@@ -87,7 +87,8 @@ int srt_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalC
 				}
 
 				unsigned new_time;
-				bool success = mem->addProcess(arrival_queue.top(), t, new_time, last_defrag_time, time_process_left_mem);
+				unsigned moved;
+				bool success = mem->addProcess(arrival_queue.top(), t, new_time, last_defrag_time, time_process_left_mem, moved);
 
 				//std::cout << "new_time = " << new_time << std::endl;
 
