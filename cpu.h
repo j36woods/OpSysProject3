@@ -1,3 +1,5 @@
+#ifndef CPU_H
+#define CPU_H
 #include "process.h"
 
 class CPU {
@@ -15,3 +17,5 @@ private:
 	Process* p;
 
 };
+
+#endif

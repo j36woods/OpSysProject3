@@ -1,3 +1,5 @@
+#ifndef IO_H
+#define IO_H
 #include <vector>
 #include <list>
 #include "process.h"
@@ -14,3 +16,5 @@ private:
 	std::list<Process*> io_processes;
 
 };
+
+#endif
