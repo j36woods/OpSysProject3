@@ -66,6 +66,7 @@ void RRQueue::updateWaitTimes() {
 	std::list<Process*>::iterator itr = this->readyQueue.begin();
 	while (itr != this->readyQueue.end()) {
 		(*itr)->increment_wait_time();
+		++itr;
 	}
 }
 

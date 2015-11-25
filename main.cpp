@@ -13,10 +13,10 @@
 #include "memory.h"
 #include "arrivalcomparison.h"
 
-void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
-		Memory* mem, unsigned t_cs, unsigned t_slice);
+int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
+		Memory* mem, unsigned t_cs, unsigned t_slice,int& num_context_switches, int& total_wait_time, int& total_turnaround_time);
 int srt_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
-		Memory *mem, int t_cs_, int n_, int &num_context_switches, int& total_wait_time);
+		Memory *mem, int t_cs_, int n_, int &num_context_switches, int& total_wait_time, int &total_turnaround_time);
 //Split the string wherever there is a '|' character
 std::vector<int> splitString(const std::string& s) {
 	std::vector<int> result;
@@ -89,23 +89,49 @@ int main(int argc, char* argv[]) {
 	BFMemory bf_mem;
 
 	int t_cs = 13;
+	unsigned t_slice = 20;
 	int end_t;
 	int total_wait_time = 0;
 	int total_turnaround_time = 0;
 	int num_context_switches = 0;
-	float average_wait_time;
 
-	std::cout << "time 0ms: Simulator started for SRT and First-Fit\n";
-	end_t = srt_simulation(arrival_queue, &ff_mem, t_cs, n, num_context_switches, total_wait_time);
-	std::cout << "time " << end_t-1 << "ms: Simulator for SRT and First-Fit ended\n";
+	std::cout << "time 0ms: Simulator started for RR and First-Fit\n";
+	end_t = rr_simulation(arrival_queue, &ff_mem, t_cs, t_slice, num_context_switches, total_wait_time, total_turnaround_time );
+	std::cout << "time " << end_t-1 << "ms: Simulator for RR and First-Fit ended\n";
 	
-	of_str << "Algorithm SRT\n";
+	of_str << "Algorithm RR + FF\n";
 	of_str << "average CPU burst time: " << average_cpu_time << " ms\n";
 	of_str << "average wait time: " << (float)total_wait_time / total_cpu_bursts << " ms\n";
-	of_str << "average turnaround time: " << (float)total_turnaround_time / num_context_switches << " ms\n";
+	of_str << "average turnaround time: " << (float)total_turnaround_time / total_cpu_bursts << " ms\n";
+	of_str << "total number of context switches: " << num_context_switches << std::endl;
+	std::cout << std::endl;
+	total_wait_time = 0;
+	total_turnaround_time = 0;
+	num_context_switches = 0;
+	std::cout << "time 0ms: Simulator started for RR and Next-Fit\n";
+	end_t = rr_simulation(arrival_queue, &nf_mem, t_cs, t_slice, num_context_switches, total_wait_time, total_turnaround_time );
+	std::cout << "time " << end_t-1 << "ms: Simulator for RR and Next-Fit ended\n";
+	of_str << std::endl;
+	of_str << "Algorithm RR + NF\n";
+	of_str << "average CPU burst time: " << average_cpu_time << " ms\n";
+	of_str << "average wait time: " << (float)total_wait_time / total_cpu_bursts << " ms\n";
+	of_str << "average turnaround time: " << (float)total_turnaround_time / total_cpu_bursts << " ms\n";
 	of_str << "total number of context switches: " << num_context_switches << std::endl;
 
 
+	std::cout << std::endl;
+	total_wait_time = 0;
+	total_turnaround_time = 0;
+	num_context_switches = 0;
+	std::cout << "time 0ms: Simulator started for RR and Best-Fit\n";
+	end_t = rr_simulation(arrival_queue, &bf_mem, t_cs, t_slice, num_context_switches, total_wait_time, total_turnaround_time );
+	std::cout << "time " << end_t-1 << "ms: Simulator for RR and Best-Fit ended\n";
+	of_str << std::endl;
+	of_str << "Algorithm RR + BF\n";
+	of_str << "average CPU burst time: " << average_cpu_time << " ms\n";
+	of_str << "average wait time: " << (float)total_wait_time / total_cpu_bursts << " ms\n";
+	of_str << "average turnaround time: " << (float)total_turnaround_time / total_cpu_bursts << " ms\n";
+	of_str << "total number of context switches: " << num_context_switches << std::endl;
 
 
 	/*std::cout << "\ntime 0ms: Simulator started for SRT and Next-Fit\n";
