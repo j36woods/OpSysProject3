@@ -3,19 +3,23 @@
 #include "memory.h"
 #include "process.h"
 #include "io.h"
+#include "cpu.h"
 #include "readyqueue.h"
 #include <iostream>
 
 void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> arrival_queue,
 		Memory* mem, unsigned t_cs, unsigned t_slice) {
-	RRQueue RR_queue;
+	RRQueue rr_queue;
 	CPU cpu;
 	IO io;
-	unsigned t = 0;
+	int t = 0;
 	unsigned n = arrival_queue.size();
 	Process* process_cs = NULL;
-	unsigned cs_finish_time;
+	int cs_finish_time;
 	unsigned curr_slice_t = 0;
+
+	int time_process_left_mem = 0;
+	int last_defrag_time = -1;
 
 	
 	while (n > 0) {
@@ -27,8 +31,8 @@ void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalC
 
 
 		//Check if a process finished using the CPU
-		Process* io_process = cpu.remove_finished_process();
-		if (io_process) {
+		Process* io_bound_process = cpu.remove_finished_process();
+		if (io_bound_process) {
 
 			std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' completed its CPU burst\n";
 			//std::cout << "with " << io_bound_process->get_num_burst() << " bursts left\n";
@@ -36,7 +40,7 @@ void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalC
 			if (io_bound_process->get_num_burst() == 0) {
 				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' finished\n";
 				n--;
-				mem->removeProcess();	
+				mem->removeProcess(io_bound_process);	
 			} else {
 				//Send the process to IO
 				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' performing I/O\n";
@@ -48,10 +52,10 @@ void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalC
 
 		//check if slice is over
 		if(curr_slice_t >= t_slice){
-			Process *next = RR_queue.getNextProcess();
+			Process *next = rr_queue.getNextProcess();
 			if(next){
 				Process* preempted = cpu.preempt_process();
-				std::cout << "time " << t << "ms: Process '" << preeempted->get_proc_num() << "' preempted due to time slice expiration\n"
+				std::cout << "time " << t << "ms: Process '" << preempted->get_proc_num() << "' preempted due to time slice expiration\n";
 				rr_queue.addProcess(preempted);
 				process_cs = next;
 				cs_finish_time = t + t_cs;
@@ -68,29 +72,61 @@ void rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalC
 
 
 
-		//Check if any processes have arrived
-		while (!arrival_queue.empty() && arrival_queue.top()->get_arrival_time() <= t) {
-			
-			int new_time = mem->addProcess(arrival_queue.top(), t);
-			
-			if (new_time == -1) /*Could not add process to memory*/ {
-				//Handle this
 
-			} else if (new_time == t) /*Process was added without defrag*/ {
-				std::cout << "time " << t << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";
-				std::cout << "time " << t << "ms: ";
-				mem->printMemory();
-				rr_queue.addProcess(arrival_queue.top());
-				arrival_queue.pop();
+		std::priority_queue<Process*, std::vector<Process*>, ArrivalComparison> new_arrival_queue;
+		while (!arrival_queue.empty()) {
 
-			} else /*Process was added after defrag*/ {
+			//!!!!!!!!!!!!!!!!!!!!Update IO, turnaround, and wait times during defrag!!!!!!!!!!!!!!!!
+
+			if (arrival_queue.top()->get_arrival_time() <= t) {
+
+				unsigned new_time;
+				unsigned moved;
+				bool success = mem->addProcess(arrival_queue.top(), t, new_time, last_defrag_time, time_process_left_mem, moved);
+
+
+				if (!success) /*Could not add process*/ {
+					
+
+
+					for (unsigned int i = 0; i < (new_time-t); i++) {
+						io.update_processes();
+					}
+
+					new_arrival_queue.push(arrival_queue.top());
+
+				} else if ((int)new_time == t) /*Process was added without defrag*/ {
+					std::cout << "time " << t << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";
+					std::cout << "time " << t << "ms: ";
+					mem->printMemory();
+					rr_queue.addProcess(arrival_queue.top());
+
+				} else /*Process was added after defrag*/ {
+					std::cout << "i goes to " << new_time-t << std::endl;
+					for (unsigned int i = 0; i < (new_time-t); i++) {
+						io.update_processes();
+					}
+
+					std::cout << "time " << new_time << "ms: Completed Defragmentation (moved " <<moved << " memory units)\n";
+					std::cout << "time " << new_time << "ms: ";
+					mem->printMemoryWithout(arrival_queue.top()->get_proc_num());
+					std::cout << "time " << new_time << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";;
+					std::cout << "time " << new_time << "ms: ";
+					mem->printMemory();
+					rr_queue.addProcess(arrival_queue.top());
+				}
+
+				//last_defrag_time = new_time;
 				t = new_time;
-				std::cout << "time " << t << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";;
-				srt_queue.addProcess(arrival_queue.top());
-				arrival_queue.pop();
+
+			} else {
+				new_arrival_queue.push(arrival_queue.top());
 			}
+
+			arrival_queue.pop();
 		}
 
+		arrival_queue = new_arrival_queue;		//Check if any processes have arrived
 
 
 		//Check if processes are waiting in the queue

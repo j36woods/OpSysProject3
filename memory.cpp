@@ -18,7 +18,28 @@ void Memory::printMemory(){
 	}
 	std::cout << std::endl;
 }
-
+void Memory::printMemoryWithout(char c){
+	std::cout << "Simulated Memory:" << std::endl;
+	unsigned line_size = 32;
+	for(unsigned i = 0; i < line_size; ++i){
+		std::cout << "=";
+	}
+	std::cout << std::endl;
+	for(unsigned j = 0; j < this->memory_bank.size(); j+= line_size){
+		for(unsigned i = j; i < j+32; ++i){
+			if(memory_bank[i] == c){
+				std::cout << '.';
+			}else{
+				std::cout << memory_bank[i];
+			}
+		}
+		std::cout << std::endl;
+	}
+	for(unsigned i = 0; i < line_size; ++i){
+		std::cout << "=";
+	}
+	std::cout << std::endl;
+}
 
 void Memory::set_t_memmove(unsigned t){
 	this->t_memmove = t;
