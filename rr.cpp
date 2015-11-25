@@ -17,7 +17,6 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 	Process* process_cs = NULL;
 	int cs_finish_time;
 	unsigned curr_slice_t = 0;
-
 	int time_process_left_mem = 0;
 	int last_defrag_time = -1;
 
