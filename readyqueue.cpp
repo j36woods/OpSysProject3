@@ -75,6 +75,7 @@ void RRQueue::printQueue() {
 	std::list<Process*>::iterator itr = this->readyQueue.begin();
 	while (itr != this->readyQueue.end()) {
 		std::cout << " " << (*itr)->get_proc_num();
+		++itr;
 	}
 	std::cout << "]\n";
 }

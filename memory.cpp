@@ -160,7 +160,6 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	Partition_T best_placement;
 	bool first = true;
 	for(std::vector<Partition_T>::iterator iter = partitions.begin(); iter != partitions.end(); ++iter){
-		std::cout << "partition starting at " << iter->first << std::endl;
 		unsigned p_size = iter->second - iter->first + 1;
 		if(p_size >= proc->get_memory()){
 			if(first){
@@ -177,9 +176,7 @@ bool NFMemory::addProcess(Process* proc, unsigned start_time, unsigned& new_time
 	}
 	if(!first){
 		this->placeProcess(proc, best_placement.first);
-		std::cout <<"prev end =" << previous_end << std::endl;
 		previous_end = best_placement.first+proc->get_memory();
-		std::cout <<"prev end =" << previous_end << std::endl;
 		return true;
 	}
 

@@ -37,9 +37,11 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 			io_bound_process->reset_wait_time();
 			io_bound_process->set_ready_queue_arrival_time(0);
 
-			std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' completed its CPU burst\n";
+			std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' completed its CPU burst";
+			rr_queue.printQueue();
 			if (io_bound_process->get_current_num_burst() == 0) {
-				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' finished\n";
+				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' finished";
+				rr_queue.printQueue();
 				n--;
 				mem->removeProcess(io_bound_process);	
 				mem->printMemory();
@@ -47,7 +49,8 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 				io_bound_process->reset_num_burst();
 			} else {
 				//Send the process to IO
-				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' performing I/O\n";
+				std::cout << "time " << t << "ms: Process '" << io_bound_process->get_proc_num() << "' performing I/O";
+				rr_queue.printQueue();
 				io.add_process(io_bound_process);
 			}
 			curr_slice_t = 0;
@@ -58,8 +61,9 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 			Process *next = rr_queue.getNextProcess();
 			if(next){
 				Process* preempted = cpu.preempt_process();
-				std::cout << "time " << t << "ms: Process '" << preempted->get_proc_num() << "' preempted due to time slice expiration\n";
+				std::cout << "time " << t << "ms: Process '" << preempted->get_proc_num() << "' preempted due to time slice expiration";
 				rr_queue.addProcess(preempted);
+				rr_queue.printQueue();
 				process_cs = next;
 				cs_finish_time = t + t_cs;
 			}
@@ -69,8 +73,9 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 		//Check if any processes completed IO
 		std::vector<Process*> finished_processes = io.remove_finished_processes();
 		for (unsigned int i = 0; i < finished_processes.size(); i++) {
-			std::cout << "time " << t << "ms: Process '" << finished_processes[i]->get_proc_num() << "' completed I/O\n";
+			std::cout << "time " << t << "ms: Process '" << finished_processes[i]->get_proc_num() << "' completed I/O";
 			rr_queue.addProcess(finished_processes[i]);
+			rr_queue.printQueue();
 			finished_processes[i]->set_ready_queue_arrival_time(t);
 		}
 
@@ -108,10 +113,10 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 
 						std::vector<Process*> finished_processes = io.remove_finished_processes();
 						for (unsigned int j = 0; j < finished_processes.size(); j++) {
-							std::cout << "time " << i+1 << "ms: Process '" << finished_processes[j]->get_proc_num() << "' completed I/O\n";
+							std::cout << "time " << i+1 << "ms: Process '" << finished_processes[j]->get_proc_num() << "' completed I/O";
 							finished_processes[j]->set_ready_queue_arrival_time(i+1);
 							rr_queue.addProcess(finished_processes[j]);
-
+							rr_queue.printQueue();
 						}
 					}
 
@@ -124,7 +129,8 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 					new_arrival_queue.push(arrival_queue.top());
 
 				} else if ((int)new_time == t) /*Process was added without defrag*/ {
-					std::cout << "time " << t << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";
+					std::cout << "time " << t << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system";
+					rr_queue.printQueue();
 					std::cout << "time " << t << "ms: ";
 					mem->printMemory();
 					arrival_queue.top()->set_ready_queue_arrival_time(t);
@@ -140,9 +146,10 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 
 						std::vector<Process*> finished_processes = io.remove_finished_processes();
 						for (unsigned int j = 0; j < finished_processes.size(); j++) {
-							std::cout << "time " << i+1 << "ms: Process '" << finished_processes[j]->get_proc_num() << "' completed I/O\n";
+							std::cout << "time " << i+1 << "ms: Process '" << finished_processes[j]->get_proc_num() << "' completed I/O";
 							finished_processes[j]->set_ready_queue_arrival_time(i+1);
 							rr_queue.addProcess(finished_processes[j]);
+							rr_queue.printQueue();
 
 						}
 					}
@@ -151,11 +158,13 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 						std::cout << "time " << new_time << "ms: Completed defragmentation (moved " << moved << " memory units)\n";
 					}
 
-					std::cout << "time " << new_time << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system\n";;
+					std::cout << "time " << new_time << "ms: Process '" << arrival_queue.top()->get_proc_num() << "' added to system";
+					arrival_queue.top()->set_ready_queue_arrival_time(new_time);
+					rr_queue.addProcess(arrival_queue.top());				
+					rr_queue.printQueue();
 					std::cout << "time " << new_time << "ms: ";
 					mem->printMemory();
-					arrival_queue.top()->set_ready_queue_arrival_time(new_time);
-					rr_queue.addProcess(arrival_queue.top());
+
 				}
 
 				//last_defrag_time = new_time;
@@ -174,7 +183,8 @@ int rr_simulation(std::priority_queue<Process*, std::vector<Process*>, ArrivalCo
 
 		//Check if processes are waiting in the queue
 		if (process_cs && cs_finish_time == t) {
-			std::cout << "time " << t << "ms: Process '" << process_cs->get_proc_num() << "' started using the CPU\n";
+			std::cout << "time " << t << "ms: Process '" << process_cs->get_proc_num() << "' started using the CPU";
+			rr_queue.printQueue();
 			//std::cout << "current_burst_time = " << process_cs->get_current_burst_time() << std::endl;
 			cpu.add_process(process_cs);
 			process_cs = NULL;
